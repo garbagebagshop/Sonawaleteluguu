@@ -32,7 +32,7 @@ async function testDatabase() {
         console.log('\n3. Checking articles table...');
         try {
             const articlesResult = await client.execute('SELECT COUNT(*) as count FROM articles');
-            const articleCount = articlesResult.rows[0]?.count || 0;
+            const articleCount = Number(articlesResult.rows[0]?.count ?? 0);
             console.log(`📝 Articles in database: ${articleCount}`);
 
             if (articleCount > 0) {
@@ -52,7 +52,7 @@ async function testDatabase() {
         console.log('\n4. Checking price_history table...');
         try {
             const pricesResult = await client.execute('SELECT COUNT(*) as count FROM price_history');
-            const priceCount = pricesResult.rows[0]?.count || 0;
+            const priceCount = Number(pricesResult.rows[0]?.count ?? 0);
             console.log(`💰 Price records in database: ${priceCount}`);
 
             if (priceCount > 0) {
