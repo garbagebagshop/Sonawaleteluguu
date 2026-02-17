@@ -1,0 +1,7 @@
+{
+  "name": "Sonawale - Hyderabad Live Gold & Silver",
+  "description": "Hyper-local Hyderabad gold and silver price tracking and expert news platform with 2026 SEO compliance.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

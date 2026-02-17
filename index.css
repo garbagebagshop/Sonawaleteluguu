@@ -1,0 +1,14 @@
+
+/* Sonawale Digital Registry - Custom CSS Overrides */
+/* Tailwind is handled via index.html CDN script for zero-config runtime stability */
+
+::selection {
+  background-color: rgba(165, 42, 42, 0.2);
+  color: #000;
+}
+
+@media (max-width: 640px) {
+  .telugu-headline {
+    font-size: 1.25em;
+  }
+}

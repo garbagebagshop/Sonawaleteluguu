@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Sitemap: https://telugu.sonawale.com/sitemap.xml
+
+# Block common bot paths
+Disallow: /admin
+Disallow: /api
+Disallow: /*.json$
+
+# Allow search engines to crawl all content
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.webp$
