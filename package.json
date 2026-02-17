@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.991.0",
+    "@aws-sdk/s3-request-presigner": "^3.991.0",
     "@libsql/client": "^0.14.0",
     "@tailwindcss/typography": "^0.5.16",
     "@vitejs/plugin-react": "^4.3.4",

@@ -74,9 +74,9 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
 
   useEffect(() => {
     if (!page) return;
-    
+
     document.title = `${page.title} | సోనావాలే హైదరాబాద్`;
-    
+
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) metaDesc.setAttribute('content', page.summary || page.title);
 
@@ -120,10 +120,10 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
         "@type": "Person",
         "name": page.author.name,
         "jobTitle": page.author.jobTitle,
-        "url": `${ORG_DETAILS.url}/#author-${page.author.handle.replace('@','')}`,
+        "url": `${ORG_DETAILS.url}/#author-${page.author.handle.replace('@', '')}`,
         "sameAs": page.author.sameAs || []
-      } : { 
-        "@id": `${ORG_DETAILS.url}/#organization` 
+      } : {
+        "@id": `${ORG_DETAILS.url}/#organization`
       },
       "publisher": { "@id": `${ORG_DETAILS.url}/#organization` },
       "articleBody": page.content.replace(/<[^>]*>?/gm, ''),
@@ -132,12 +132,29 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
     };
 
     if (isTodayGoldPage) {
-       primarySchema.mainEntity = {
-          "@type": "PriceSpecification",
-          "price": prices.gold24k,
-          "priceCurrency": "INR",
-          "validFrom": new Date().toISOString().split('T')[0]
-       };
+      primarySchema.mainEntity = {
+        "@type": "PriceSpecification",
+        "price": prices.gold24k,
+        "priceCurrency": "INR",
+        "validFrom": new Date().toISOString().split('T')[0]
+      };
+      // Add LocalBusiness Schema details
+      primarySchema.publisher = {
+        "@type": "JewelryStore",
+        "name": ORG_DETAILS.name,
+        "image": ORG_DETAILS.logo,
+        "telephone": ORG_DETAILS.telephone,
+        "address": {
+          "@type": "PostalAddress",
+          ...ORG_DETAILS.address
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          ...ORG_DETAILS.geo
+        },
+        "priceRange": ORG_DETAILS.priceRange,
+        "url": ORG_DETAILS.url
+      };
     }
 
     const breadcrumbSchema = {
@@ -153,26 +170,26 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
     script.text = JSON.stringify([primarySchema, breadcrumbSchema]);
     window.scrollTo(0, 0);
 
-    return () => { 
-      document.title = 'Sonawale | Hyderabad Live Gold & Silver Registry'; 
+    return () => {
+      document.title = 'Sonawale | Hyderabad Live Gold & Silver Registry';
     };
   }, [page, slug, isArticle, currentGuide, prices, isTodayGoldPage]);
 
   const allRelated = useMemo<RelatedArticle[]>(() => {
     if (!isArticle || !currentGuide) return [];
-    
+
     const currentKeywords = (currentGuide.focusKeywords || currentGuide.title)
       .toLowerCase()
       .split(/[\s,]+/)
       .filter(k => k.length > 3);
-      
+
     return guides
       .filter((g: Guide) => g.slug !== slug)
       .map((g: Guide) => {
         const targetText = (g.title + ' ' + (g.focusKeywords || '')).toLowerCase();
         let score = currentKeywords.filter(k => targetText.includes(k)).length;
         if (g.category && currentGuide.category && g.category === currentGuide.category) {
-          score += 5; 
+          score += 5;
         }
         return { ...g, score };
       })
@@ -219,7 +236,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
         </div>
         <h2 className="text-2xl font-black italic mb-4 telugu-headline uppercase">కథనం కనుగొనబడలేదు</h2>
         <p className="telugu-text opacity-70 mb-8">క్షమించండి, మీరు అభ్యర్థించిన వార్తా నివేదిక ప్రస్తుతం అందుబాటులో లేదు లేదా సర్వర్‌లో అప్‌డేట్ అవుతోంది.</p>
-        <button 
+        <button
           onClick={onBack}
           className="px-8 py-4 border-2 border-black font-black uppercase tracking-widest utility-font hover:bg-black hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none"
         >
@@ -247,7 +264,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
           <h1 className="text-4xl md:text-7xl font-bold telugu-headline leading-[1.1] tracking-tighter text-black mb-6" itemProp="headline">
             {page.title}
           </h1>
-          
+
           <div className="flex flex-col md:flex-row md:items-center justify-between border-y-2 border-black py-6 mb-8">
             <div className="flex items-center gap-3">
               {isArticle && page.author ? (
@@ -275,31 +292,57 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
 
           {isTodayGoldPage && (
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
-               <div className="md:col-span-4">
-                  <PriceDashboard prices={prices} loading={false} />
-                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 text-[10px] font-bold utility-font flex items-start gap-2">
-                    <Info size={14} className="shrink-0 text-yellow-600" />
-                    <span>Rates shown are indicative for 999 Purity Gold (24K) and 916 Purity Jewelry (22K) at Hyderabad Markets.</span>
-                  </div>
-               </div>
-               <div className="md:col-span-8 bg-white border border-black p-4">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-[9px] font-black uppercase tracking-widest utility-font">7-Day Price History (24K)</span>
-                    <span className="text-[8px] opacity-40 utility-font font-bold">LIVE SYNC ACTIVE</span>
-                  </div>
-                  <div className="h-[250px]">
-                    <TrendVisualizer history={priceHistory} />
-                  </div>
-               </div>
+              <div className="md:col-span-4">
+                <PriceDashboard prices={prices} loading={false} />
+                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 text-[10px] font-bold utility-font flex items-start gap-2">
+                  <Info size={14} className="shrink-0 text-yellow-600" />
+                  <span>Rates shown are indicative for 999 Purity Gold (24K) and 916 Purity Jewelry (22K) at Hyderabad Markets.</span>
+                </div>
+              </div>
+              <div className="md:col-span-8 bg-white border border-black p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-[9px] font-black uppercase tracking-widest utility-font">7-Day Price History (24K)</span>
+                  <span className="text-[8px] opacity-40 utility-font font-bold">LIVE SYNC ACTIVE</span>
+                </div>
+                <div className="h-[250px] mb-8">
+                  <TrendVisualizer history={priceHistory} />
+                </div>
+
+                {/* Historical Data Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-black text-white text-[10px] uppercase font-black tracking-widest">
+                        <th className="p-3">Date</th>
+                        <th className="p-3">Gold 24K (10g)</th>
+                        <th className="p-3">Trend</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-xs font-bold utility-font">
+                      {priceHistory.map((day, idx) => (
+                        <tr key={idx} className="border-b border-black/10 hover:bg-gray-50">
+                          <td className="p-3">{day.fullDate ? new Date(day.fullDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : day.time}</td>
+                          <td className="p-3">₹{day.price.toLocaleString()}</td>
+                          <td className="p-3 text-[10px] opacity-60">
+                            {idx < priceHistory.length - 1 ? (
+                              day.price > priceHistory[idx + 1].price ? <span className="text-green-600">▲</span> : <span className="text-red-600">▼</span>
+                            ) : '-'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           )}
 
           {page.featuredImage && !isTodayGoldPage && (
             <figure className="mb-12 border-2 border-black overflow-hidden relative shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]">
-              <img 
-                src={page.featuredImage} 
-                alt={page.imageAlt || page.title} 
-                className="w-full h-full object-cover aspect-video md:aspect-[21/9]" 
+              <img
+                src={page.featuredImage}
+                alt={page.imageAlt || page.title}
+                className="w-full h-full object-cover aspect-video md:aspect-[21/9]"
                 loading="eager"
               />
               <figcaption className="bg-black text-white text-[9px] font-black uppercase tracking-[0.2em] py-2 px-4 italic flex justify-between utility-font">
@@ -310,10 +353,10 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
           )}
         </header>
 
-        <div 
-          className="telugu-text prose prose-lg md:prose-xl prose-black max-w-none mb-24 drop-cap selection:bg-yellow-200" 
+        <div
+          className="telugu-text prose prose-lg md:prose-xl prose-black max-w-none mb-24 drop-cap selection:bg-yellow-200"
           itemProp="articleBody"
-          dangerouslySetInnerHTML={{ __html: page.content }} 
+          dangerouslySetInnerHTML={{ __html: page.content }}
         />
       </article>
     </div>

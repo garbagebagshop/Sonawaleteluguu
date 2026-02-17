@@ -1,7 +1,12 @@
 
+const getEnv = (key: string): string | undefined => {
+  // @ts-ignore
+  return process.env[key] || (import.meta as any).env?.[`VITE_${key}`] || (import.meta as any).env?.[key];
+};
+
 export const R2_CONFIG = {
-  endpoint: 'https://d2ee658194859b79564077fad96456cc.r2.cloudflarestorage.com/telugu-sonawale',
-  publicUrl: 'https://pub-0a5d163a427242319da103daaf44fbf3.r2.dev',
+  endpoint: getEnv('R2_ENDPOINT') ? `${getEnv('R2_ENDPOINT')}/${getEnv('R2_BUCKET_NAME')}` : 'https://d2ee658194859b79564077fad96456cc.r2.cloudflarestorage.com/telugu-sonawale',
+  publicUrl: getEnv('R2_PUBLIC_URL') || getEnv('VITE_R2_PUBLIC_URL') || 'https://pub-0a5d163a427242319da103daaf44fbf3.r2.dev',
 };
 
 /**
@@ -36,26 +41,37 @@ export const convertToWebP = (file: File): Promise<Blob> => {
  * Uploads an image to Cloudflare R2.
  */
 export const uploadToR2 = async (data: Blob | File, slug: string): Promise<string> => {
+  const fileType = data.type === 'image/webp' ? 'image/webp' : 'image/jpeg';
   const fileName = `${slug}-${Date.now()}.webp`;
-  const uploadUrl = `${R2_CONFIG.endpoint}/${fileName}`;
 
   try {
-    const response = await fetch(uploadUrl, {
+    // 1. Get Pre-signed URL from Backend
+    const signRes = await fetch('/api/sign-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: fileName, contentType: fileType }),
+    });
+
+    if (!signRes.ok) {
+      throw new Error(`Sign request failed: ${signRes.statusText}`);
+    }
+
+    const { uploadUrl, publicUrl } = await signRes.json();
+
+    // 2. Upload to R2 using the pre-signed URL
+    const uploadRes = await fetch(uploadUrl, {
       method: 'PUT',
       body: data,
       headers: {
-        'Content-Type': 'image/webp',
+        'Content-Type': fileType,
       },
     });
 
-    if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
-        throw new Error("R2 Access Denied: CORS or Pre-signed URL required.");
-      }
-      throw new Error(`R2 Upload Failed: ${response.status}`);
+    if (!uploadRes.ok) {
+      throw new Error(`R2 Upload Failed: ${uploadRes.status}`);
     }
 
-    return `${R2_CONFIG.publicUrl}/${fileName}`;
+    return publicUrl;
   } catch (error) {
     console.error('SONAWALE DEBUG: R2 Storage Error:', error);
     throw error;
