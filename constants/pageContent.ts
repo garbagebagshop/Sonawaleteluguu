@@ -1,6 +1,6 @@
 
 export const PAGE_CONTENT: Record<string, { title: string; content: string; subtitle?: string; focusKeywords?: string }> = {
-  'today-gold': {
+  'today-gold-rates-in-hyderabad': {
     title: "Today Gold Rate in Hyderabad: 22 Carat & 24 Carat Live Updates (India)",
     subtitle: "నేటి బంగారం ధరలు - హైదరాబాద్ లైవ్ రిపోర్ట్ (Updated 2026)",
     focusKeywords: "today gold rate in hyderabad, today gold rate in hyderabad 24 carat, today gold rate in hyderabad 22 carat, today gold rate in hyderabad live, today gold rate in hyderabad 24 carat 916 kdm, gold price hyderabad india",

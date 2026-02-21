@@ -61,19 +61,20 @@ const App: React.FC = () => {
       const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
       const hash = window.location.hash.replace(/^#\/?|\/?$/g, '');
       const route = decodeURIComponent(path || hash || '');
+      const normalizedRoute = route === 'today-gold' ? 'today-gold-rates-in-hyderabad' : route;
 
-      if (route === 'rss.xml') {
+      if (normalizedRoute === 'rss.xml') {
         setShowRss(true);
         setShowSitemap(false);
         setCurrentPage(null);
-      } else if (route === 'sitemap.xml') {
+      } else if (normalizedRoute === 'sitemap.xml') {
         setShowSitemap(true);
         setShowRss(false);
         setCurrentPage(null);
-      } else if (route) {
+      } else if (normalizedRoute) {
         setShowRss(false);
         setShowSitemap(false);
-        setCurrentPage(route);
+        setCurrentPage(normalizedRoute);
       } else {
         setCurrentPage(null);
         setShowRss(false);
@@ -163,7 +164,7 @@ const App: React.FC = () => {
           <button onClick={handleBack} className="text-yellow-400 flex items-center gap-1 shrink-0">
             <Home size={14} /> హోమ్
           </button>
-          <button onClick={() => handleNavigate('today-gold')} className="hover:text-yellow-400 shrink-0">నేటి ధరలు</button>
+          <button onClick={() => handleNavigate('today-gold-rates-in-hyderabad')} className="hover:text-yellow-400 shrink-0">నేటి ధరలు</button>
           <button onClick={() => handleNavigate('pot-market')} className="hover:text-yellow-400 shrink-0">మార్కెట్</button>
           <button onClick={() => handleNavigate('investment-analysis')} className="hover:text-yellow-400 shrink-0">పెట్టుబడి</button>
           <button onClick={() => handleNavigate('tax-compliance')} className="hover:text-yellow-400 shrink-0">GST</button>
@@ -305,7 +306,7 @@ const App: React.FC = () => {
           <div>
             <h4 className="font-black uppercase text-[11px] mb-6 tracking-widest border-l-2 border-[#B90000] pl-3">ముఖ్యమైన లింకులు</h4>
             <ul className="space-y-4 text-[14px] font-bold telugu-headline opacity-60">
-              <li><button onClick={() => handleNavigate('today-gold')} className="hover:text-yellow-400">నేటి బంగారం ధరలు (Today Prices)</button></li>
+              <li><button onClick={() => handleNavigate('today-gold-rates-in-hyderabad')} className="hover:text-yellow-400">నేటి బంగారం ధరలు (Today Prices)</button></li>
               <li><button onClick={() => handleNavigate('pot-market')} className="hover:text-yellow-400">పొట్ మార్కెట్ రిపోర్ట్</button></li>
               <li><button onClick={() => handleNavigate('investment-analysis')} className="hover:text-yellow-400">పెట్టుబడి విశ్లేషణ</button></li>
               <li><button onClick={() => handleNavigate('hallmarking-directory')} className="hover:text-yellow-400">హాల్‌మార్క్ కేంద్రాలు</button></li>

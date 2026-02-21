@@ -70,7 +70,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
   }, [staticPage, currentGuide]);
 
   const isArticle = !!currentGuide;
-  const isTodayGoldPage = slug === 'today-gold';
+  const isTodayGoldPage = slug === 'today-gold-rates-in-hyderabad' || slug === 'today-gold';
 
   useEffect(() => {
     if (!page) return;
