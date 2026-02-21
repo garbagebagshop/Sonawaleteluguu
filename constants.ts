@@ -76,7 +76,7 @@ export const GUIDES: Guide[] = [
     author: AUTHORS.mredd,
     summary: "How the 6-digit hallmarking system revolutionized trust in local bullion markets.",
     featuredImage: "https://images.unsplash.com/photo-1610375461246-83df859d849d?q=80&w=1200&auto=format&fit=crop",
-    content: "<a href='#bis-hallmarking-guide' class='internal-link'>BIS Hallmarking</a> is mandatory for gold jewelry in Hyderabad. When buying from the historic <a href='#pot-market-insider' class='internal-link'>Pot Market</a>, consumers must verify the purity grade and the unique <a href='#bis-hallmarking-guide' class='internal-link'>HUID</a> to ensure legal compliance."
+    content: "<a href='/bis-hallmarking-guide' class='internal-link'>BIS Hallmarking</a> is mandatory for gold jewelry in Hyderabad. When buying from the historic <a href='/pot-market-insider' class='internal-link'>Pot Market</a>, consumers must verify the purity grade and the unique <a href='/bis-hallmarking-guide' class='internal-link'>HUID</a> to ensure legal compliance."
   },
   {
     title: "Market Transition: The Decline of KDM Gold",
@@ -84,7 +84,7 @@ export const GUIDES: Guide[] = [
     author: AUTHORS.skulkarni,
     summary: "Historical perspective on Cadmium soldering and the move to the 916 global standard.",
     featuredImage: "https://images.unsplash.com/photo-1573408302355-4e0b7caf3ad5?q=80&w=1200&auto=format&fit=crop",
-    content: "<a href='#kdm-vs-916' class='internal-link'>KDM</a> refers to gold soldered with Cadmium. Due to health risks, most <a href='#market-today' class='internal-link'>Hyderabad jewelers</a> have transitioned to the globally recognized <a href='#bis-hallmarking-guide' class='internal-link'>916 gold</a> standard for all new collections."
+    content: "<a href='/kdm-vs-916' class='internal-link'>KDM</a> refers to gold soldered with Cadmium. Due to health risks, most <a href='/market-today' class='internal-link'>Hyderabad jewelers</a> have transitioned to the globally recognized <a href='/bis-hallmarking-guide' class='internal-link'>916 gold</a> standard for all new collections."
   },
   {
     title: "Inside the Pot Market: A Bullion Hub",
@@ -92,6 +92,6 @@ export const GUIDES: Guide[] = [
     author: AUTHORS.vrao,
     summary: "Secunderabad's historic center remains the heart of wholesale silver trade.",
     featuredImage: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?q=80&w=1200&auto=format&fit=crop",
-    content: "The <a href='#pot-market-insider' class='internal-link'>Pot Market</a> in Secunderabad remains legendary. As the city's heart for <a href='#market-today' class='internal-link'>wholesale silver</a> and bullion trade, it dictates the daily making charges across the Deccan region."
+    content: "The <a href='/pot-market-insider' class='internal-link'>Pot Market</a> in Secunderabad remains legendary. As the city's heart for <a href='/market-today' class='internal-link'>wholesale silver</a> and bullion trade, it dictates the daily making charges across the Deccan region."
   }
 ];

@@ -32,7 +32,7 @@ const escapeXml = (unsafe: string) => {
 export const generateRssFeed = (articles: Guide[]): string => {
   const itemsXml = articles
     .map((article) => {
-      const link = `${ORG_DETAILS.url}/#${article.slug}`;
+      const link = `${ORG_DETAILS.url}/${article.slug}`;
       const pubDate = toRFC822(article.date);
       
       return `
@@ -56,7 +56,7 @@ export const generateRssFeed = (articles: Guide[]): string => {
     <description>${escapeXml(ORG_DETAILS.description)}</description>
     <language>te-IN</language>
     <lastBuildDate>${toRFC822()}</lastBuildDate>
-    <atom:link href="${ORG_DETAILS.url}/#rss.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="${ORG_DETAILS.url}/rss.xml" rel="self" type="application/rss+xml" />
     ${itemsXml}
   </channel>
 </rss>`;

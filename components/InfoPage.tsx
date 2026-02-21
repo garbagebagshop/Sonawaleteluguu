@@ -96,12 +96,20 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
     }
 
     const datePublished = currentGuide?.date || new Date().toISOString();
-    const canonicalUrl = `${ORG_DETAILS.url}/#${encodeURIComponent(slug)}`;
+    const canonicalUrl = `${ORG_DETAILS.url}/${encodeURIComponent(slug)}`;
+
+    let canonicalTag = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonicalTag) {
+      canonicalTag = document.createElement('link');
+      canonicalTag.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalTag);
+    }
+    canonicalTag.setAttribute('href', canonicalUrl);
 
     const primarySchema: any = {
       "@context": "https://schema.org",
       "@type": isArticle ? "NewsArticle" : "WebPage",
-      "@id": `${ORG_DETAILS.url}/#article-${encodeURIComponent(slug)}`,
+      "@id": `${ORG_DETAILS.url}/article/${encodeURIComponent(slug)}`,
       "mainEntityOfPage": {
         "@type": "WebPage",
         "@id": canonicalUrl
@@ -120,7 +128,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
         "@type": "Person",
         "name": page.author.name,
         "jobTitle": page.author.jobTitle,
-        "url": `${ORG_DETAILS.url}/#author-${page.author.handle.replace('@', '')}`,
+        "url": `${ORG_DETAILS.url}/author/${page.author.handle.replace('@', '')}`,
         "sameAs": page.author.sameAs || []
       } : {
         "@id": `${ORG_DETAILS.url}/#organization`
@@ -162,7 +170,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
       "@type": "BreadcrumbList",
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "హోమ్", "item": ORG_DETAILS.url },
-        { "@type": "ListItem", "position": 2, "name": page.category, "item": `${ORG_DETAILS.url}/#category-${page.category?.toLowerCase().replace(/\s+/g, '-')}` },
+        { "@type": "ListItem", "position": 2, "name": page.category, "item": `${ORG_DETAILS.url}/category/${page.category?.toLowerCase().replace(/\s+/g, '-')}` },
         { "@type": "ListItem", "position": 3, "name": page.title, "item": canonicalUrl }
       ]
     };
@@ -216,8 +224,10 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
     return () => observer.disconnect();
   }, [allRelated.length, displayedCount, isArticle, isLoadingMore]);
 
+  const safeContentHtml = (page?.content || '').replace(/href=(['"])#([^'"]+)\1/g, 'href="/$2"');
+
   const handleShare = (platform: 'twitter' | 'facebook' | 'whatsapp', title: string, itemSlug: string) => {
-    const url = encodeURIComponent(`${window.location.origin}/#${itemSlug}`);
+    const url = encodeURIComponent(`${window.location.origin}/${itemSlug}`);
     const text = encodeURIComponent(`Market Update: ${title}`);
     let shareUrl = '';
     switch (platform) {
@@ -356,7 +366,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ slug, onBack, guides = [], o
         <div
           className="telugu-text prose prose-lg md:prose-xl prose-black max-w-none mb-24 drop-cap selection:bg-yellow-200"
           itemProp="articleBody"
-          dangerouslySetInnerHTML={{ __html: page.content }}
+          dangerouslySetInnerHTML={{ __html: safeContentHtml }}
         />
       </article>
     </div>

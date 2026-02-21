@@ -8,8 +8,8 @@ interface BreadcrumbProps {
 
 export const Breadcrumbs: React.FC<BreadcrumbProps> = ({ items }) => {
   const handleHomeClick = () => {
-    // Standardize return to root
-    window.location.hash = '';
+    window.history.pushState(null, '', '/');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
   return (
@@ -26,7 +26,12 @@ export const Breadcrumbs: React.FC<BreadcrumbProps> = ({ items }) => {
             <span className="text-[#A52A2A]" aria-current="page">{item.label}</span>
           ) : (
             <button 
-              onClick={() => item.href && (window.location.hash = item.href)}
+              onClick={() => {
+                if (!item.href) return;
+                const cleanHref = item.href.replace(/^\/+|\/+$/g, '');
+                window.history.pushState(null, '', cleanHref ? `/${cleanHref}` : '/');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }}
               className="hover:text-[#A52A2A] transition-colors"
             >
               {item.label}

@@ -45,11 +45,8 @@ const App: React.FC = () => {
 
   const handleBack = () => {
     try {
-      if (!window.location.href.startsWith('blob:')) {
-        window.history.pushState(null, '', window.location.pathname || '/');
-      } else {
-        window.location.hash = '';
-      }
+      window.history.pushState(null, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
     } catch (e) {
       window.location.hash = '';
     }
@@ -60,27 +57,23 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    const handleHashChange = () => {
-      let rawHash = window.location.hash.replace(/^#\/?|\/?$/g, '');
-      let hash = rawHash;
-      try {
-        hash = decodeURIComponent(rawHash);
-      } catch (e) {
-        console.warn("Failed to decode hash:", rawHash);
-      }
+    const parseRoute = () => {
+      const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
+      const hash = window.location.hash.replace(/^#\/?|\/?$/g, '');
+      const route = decodeURIComponent(path || hash || '');
 
-      if (hash === 'rss.xml') {
+      if (route === 'rss.xml') {
         setShowRss(true);
         setShowSitemap(false);
         setCurrentPage(null);
-      } else if (hash === 'sitemap.xml') {
+      } else if (route === 'sitemap.xml') {
         setShowSitemap(true);
         setShowRss(false);
         setCurrentPage(null);
-      } else if (hash) {
+      } else if (route) {
         setShowRss(false);
         setShowSitemap(false);
-        setCurrentPage(hash);
+        setCurrentPage(route);
       } else {
         setCurrentPage(null);
         setShowRss(false);
@@ -88,8 +81,9 @@ const App: React.FC = () => {
       }
     };
 
-    window.addEventListener('hashchange', handleHashChange);
-    handleHashChange();
+    window.addEventListener('hashchange', parseRoute);
+    window.addEventListener('popstate', parseRoute);
+    parseRoute();
 
     const loadData = async () => {
       setLoading(true);
@@ -111,7 +105,10 @@ const App: React.FC = () => {
     };
 
     loadData();
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', parseRoute);
+      window.removeEventListener('popstate', parseRoute);
+    };
   }, []);
 
   const handleUpdatePrices = async (newPrices: PriceData) => {
@@ -130,7 +127,10 @@ const App: React.FC = () => {
   };
 
   const handleNavigate = (slug: string) => {
-    window.location.hash = slug;
+    const cleanSlug = encodeURIComponent(slug.replace(/^\/+|\/+$/g, ''));
+    window.history.pushState(null, '', `/${cleanSlug}`);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    window.scrollTo(0, 0);
   };
 
   if (showRss || showSitemap) {

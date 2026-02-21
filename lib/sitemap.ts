@@ -39,7 +39,7 @@ export const generateSitemap = (articles: Guide[]): string => {
   Object.keys(PAGE_CONTENT).forEach((slug) => {
     sitemapEntries += `
   <url>
-    <loc>${baseUrl}/#${slug}</loc>
+    <loc>${baseUrl}/${slug}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -51,7 +51,7 @@ export const generateSitemap = (articles: Guide[]): string => {
     const articleDate = article.date ? article.date.split('T')[0] : today;
     sitemapEntries += `
   <url>
-    <loc>${baseUrl}/#${escapeXml(article.slug)}</loc>
+    <loc>${baseUrl}/${escapeXml(article.slug)}</loc>
     <lastmod>${articleDate}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
