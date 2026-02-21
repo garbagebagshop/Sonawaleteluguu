@@ -432,8 +432,8 @@ export const AuthorPortal: React.FC<AuthorPortalProps> = ({
                       The database is currently inaccessible. To enable publishing, you must add these keys to your hosting environment (e.g., Vercel Project Settings → Environment Variables):
                     </p>
                     <ul className="text-[10px] font-mono space-y-2 opacity-60">
-                      <li className="flex justify-between"><span>TURSO_DATABASE_URL / TURSO_URL:</span> <span className={dbStatus.urlDetected ? 'text-green-600' : 'text-red-600'}>{dbStatus.urlDetected ? 'PRESENT' : 'MISSING'}</span></li>
-                      <li className="flex justify-between"><span>TURSO_AUTH_TOKEN:</span> <span className={dbStatus.tokenDetected ? 'text-green-600' : 'text-red-600'}>{dbStatus.tokenDetected ? 'PRESENT' : 'MISSING'}</span></li>
+                      <li className="flex justify-between"><span>VITE_TURSO_URL (or VITE_TURSO_DATABASE_URL):</span> <span className={dbStatus.urlDetected ? 'text-green-600' : 'text-red-600'}>{dbStatus.urlDetected ? 'PRESENT' : 'MISSING'}</span></li>
+                      <li className="flex justify-between"><span>VITE_TURSO_AUTH_TOKEN:</span> <span className={dbStatus.tokenDetected ? 'text-green-600' : 'text-red-600'}>{dbStatus.tokenDetected ? 'PRESENT' : 'MISSING'}</span></li>
                     </ul>
                   </div>
                 )}

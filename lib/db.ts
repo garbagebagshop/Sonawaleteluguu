@@ -5,12 +5,14 @@ import { AUTHORS } from '../constants';
 
 /**
  * Connection Logic:
- * We check both process.env (Vercel/Node) and import.meta.env (Vite)
- * to ensure the keys are picked up regardless of the environment.
+ * - Browser builds can only access `import.meta.env.VITE_*` values.
+ * - Node/server builds can access `process.env` values.
+ * This helper reads both safely without assuming `process` exists in the browser.
  */
 const getEnv = (key: string): string | undefined => {
-  // @ts-ignore
-  return process.env[key] || (import.meta as any).env?.[`VITE_${key}`] || (import.meta as any).env?.[key];
+  const viteEnv = (import.meta as any).env;
+  const processEnv = (globalThis as any)?.process?.env;
+  return viteEnv?.[`VITE_${key}`] || viteEnv?.[key] || processEnv?.[key];
 };
 
 const url = getEnv('TURSO_DATABASE_URL') || getEnv('TURSO_URL');
