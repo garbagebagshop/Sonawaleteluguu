@@ -31,6 +31,7 @@ export const AuthorPortal: React.FC<AuthorPortalProps> = ({
   const [uploadProgress, setUploadProgress] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [r2Status, setR2Status] = useState<'checking' | 'connected' | 'offline' | 'unknown'>('checking');
 
   // Auth logic: environment override with requested bootstrap fallback.
   const DEFAULT_ADMIN_ID = '8886575507';
@@ -61,6 +62,38 @@ export const AuthorPortal: React.FC<AuthorPortalProps> = ({
       contentRef.current.style.height = `${contentRef.current.scrollHeight}px`;
     }
   }, [content, view]);
+
+
+  useEffect(() => {
+    const checkR2 = async () => {
+      try {
+        const res = await fetch('/api/sign-upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: `health-check-${Date.now()}.webp`, contentType: 'image/webp' })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setR2Status(data?.uploadUrl ? 'connected' : 'unknown');
+          return;
+        }
+
+        if (res.status === 404 || res.status === 405) {
+          setR2Status('unknown');
+        } else {
+          setR2Status('offline');
+        }
+      } catch {
+        setR2Status('offline');
+      }
+    };
+
+    if (isLoggedIn) {
+      setR2Status('checking');
+      checkR2();
+    }
+  }, [isLoggedIn]);
 
   /**
    * Inserts formatting tags into the content textarea at current cursor position
@@ -421,7 +454,7 @@ export const AuthorPortal: React.FC<AuthorPortalProps> = ({
                   <div className="p-4 border border-black/10 text-center">
                     <Cloud size={20} className="mx-auto mb-2 text-purple-600" />
                     <span className="text-[9px] font-black uppercase opacity-40 block">Storage</span>
-                    <span className="text-sm font-black">HYBRID</span>
+                    <span className={`text-sm font-black ${r2Status === 'connected' ? 'text-green-600' : r2Status === 'offline' ? 'text-red-600' : ''}`}>{r2Status === 'checking' ? 'CHECKING...' : r2Status === 'connected' ? 'ACTIVE' : r2Status === 'offline' ? 'OFFLINE' : 'UNKNOWN'}</span>
                   </div>
                 </div>
 
@@ -434,6 +467,7 @@ export const AuthorPortal: React.FC<AuthorPortalProps> = ({
                     <ul className="text-[10px] font-mono space-y-2 opacity-60">
                       <li className="flex justify-between"><span>VITE_TURSO_URL (or VITE_TURSO_DATABASE_URL):</span> <span className={dbStatus.urlDetected ? 'text-green-600' : 'text-red-600'}>{dbStatus.urlDetected ? 'PRESENT' : 'MISSING'}</span></li>
                       <li className="flex justify-between"><span>VITE_TURSO_AUTH_TOKEN:</span> <span className={dbStatus.tokenDetected ? 'text-green-600' : 'text-red-600'}>{dbStatus.tokenDetected ? 'PRESENT' : 'MISSING'}</span></li>
+                      <li className="flex justify-between"><span>R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY:</span> <span className={r2Status === 'connected' ? 'text-green-600' : r2Status === 'offline' ? 'text-red-600' : 'text-yellow-600'}>{r2Status === 'connected' ? 'DETECTED' : r2Status === 'offline' ? 'MISSING/INVALID' : 'UNKNOWN'}</span></li>
                     </ul>
                   </div>
                 )}
