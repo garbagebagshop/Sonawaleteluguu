@@ -32,11 +32,13 @@ export const AuthorPortal: React.FC<AuthorPortalProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Auth logic: Environment-only (no hardcoded fallbacks for security)
+  // Auth logic: environment override with requested bootstrap fallback.
+  const DEFAULT_ADMIN_ID = '8886575507';
+  const DEFAULT_ADMIN_PASSWORD = 'Harsh@123';
   // @ts-ignore
-  const ADMIN_ID = process.env.ADMIN_ID || (import.meta as any).env?.VITE_ADMIN_ID;
+  const ADMIN_ID = process.env.ADMIN_ID || (import.meta as any).env?.VITE_ADMIN_ID || DEFAULT_ADMIN_ID;
   // @ts-ignore
-  const ADMIN_PASS = process.env.ADMIN_PASSWORD || (import.meta as any).env?.VITE_ADMIN_PASSWORD;
+  const ADMIN_PASS = process.env.ADMIN_PASSWORD || (import.meta as any).env?.VITE_ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
 
   const dbStatus = getDbStatus();
 
@@ -98,12 +100,6 @@ export const AuthorPortal: React.FC<AuthorPortalProps> = ({
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate that credentials are configured
-    if (!ADMIN_ID || !ADMIN_PASS) {
-      setErrorMessage("Admin credentials not configured. Set VITE_ADMIN_ID and VITE_ADMIN_PASSWORD in environment.");
-      return;
-    }
-
     if (loginId === ADMIN_ID && password === ADMIN_PASS) {
       setIsLoggedIn(true);
       setErrorMessage(null);
@@ -113,13 +109,22 @@ export const AuthorPortal: React.FC<AuthorPortalProps> = ({
   };
 
   const handlePriceUpdate = async () => {
+    const next24k = Number(localGold24k);
+    const next22k = Number(localGold22k);
+    const nextSilver = Number(localSilver);
+
+    if (![next24k, next22k, nextSilver].every((n) => Number.isFinite(n) && n > 0)) {
+      setErrorMessage('Enter valid positive values for all price fields before updating.');
+      return;
+    }
+
     setIsUpdatingPrices(true);
     setErrorMessage(null);
     try {
       await onUpdatePrices({
-        gold24k: parseInt(localGold24k),
-        gold22k: parseInt(localGold22k),
-        silver: parseInt(localSilver),
+        gold24k: Math.round(next24k),
+        gold22k: Math.round(next22k),
+        silver: Math.round(nextSilver),
         lastUpdated: new Date().toLocaleTimeString('te-IN')
       });
       setSuccessMessage("Live Market Prices Commited to Turso DB.");
@@ -267,7 +272,7 @@ export const AuthorPortal: React.FC<AuthorPortalProps> = ({
               <button onClick={() => setErrorMessage(null)} className="p-1 hover:bg-white/20"><X size={16} /></button>
             </div>
             {errorMessage.includes("connection missing") && (
-              <p className="mt-2 text-[8px] font-bold opacity-70 uppercase">Ensure TURSO_URL and TURSO_AUTH_TOKEN are set in Vercel settings.</p>
+              <p className="mt-2 text-[8px] font-bold opacity-70 uppercase">Ensure TURSO_DATABASE_URL (or TURSO_URL) and TURSO_AUTH_TOKEN are set in Vercel settings. For Vite builds, also expose VITE_TURSO_URL and VITE_TURSO_AUTH_TOKEN.</p>
             )}
             {errorMessage.includes("R2 Storage Offline") && (
               <button
@@ -406,7 +411,7 @@ export const AuthorPortal: React.FC<AuthorPortalProps> = ({
                   <div className="p-4 border border-black/10 text-center">
                     <ShieldAlert size={20} className="mx-auto mb-2 text-blue-600" />
                     <span className="text-[9px] font-black uppercase opacity-40 block">Identity</span>
-                    <span className="text-sm font-black uppercase">{ADMIN_ID.slice(-4)}..REPORTER</span>
+                    <span className="text-sm font-black uppercase">{(ADMIN_ID || '0000').slice(-4)}..REPORTER</span>
                   </div>
                   <div className="p-4 border border-black/10 text-center">
                     <RefreshCw size={20} className="mx-auto mb-2 text-yellow-600" />
@@ -427,7 +432,7 @@ export const AuthorPortal: React.FC<AuthorPortalProps> = ({
                       The database is currently inaccessible. To enable publishing, you must add these keys to your hosting environment (e.g., Vercel Project Settings → Environment Variables):
                     </p>
                     <ul className="text-[10px] font-mono space-y-2 opacity-60">
-                      <li className="flex justify-between"><span>TURSO_URL:</span> <span className={dbStatus.urlDetected ? 'text-green-600' : 'text-red-600'}>{dbStatus.urlDetected ? 'PRESENT' : 'MISSING'}</span></li>
+                      <li className="flex justify-between"><span>TURSO_DATABASE_URL / TURSO_URL:</span> <span className={dbStatus.urlDetected ? 'text-green-600' : 'text-red-600'}>{dbStatus.urlDetected ? 'PRESENT' : 'MISSING'}</span></li>
                       <li className="flex justify-between"><span>TURSO_AUTH_TOKEN:</span> <span className={dbStatus.tokenDetected ? 'text-green-600' : 'text-red-600'}>{dbStatus.tokenDetected ? 'PRESENT' : 'MISSING'}</span></li>
                     </ul>
                   </div>
